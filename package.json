@@ -1,0 +1,24 @@
+{
+  "name": "jsonapi-bookshelf",
+  "version": "0.0.1",
+  "description": "Bookshelf model based api middleware using JSON API",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jthoms1/jsonapi-bookshelf.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jthoms1/jsonapi-bookshelf/issues"
+  },
+  "homepage": "https://github.com/jthoms1/jsonapi-bookshelf",
+  "devDependencies": {
+    "bookshelf": "^0.7.9",
+    "express": "^4.11.1",
+    "supertest": "^0.15.0"
+  }
+}
