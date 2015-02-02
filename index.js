@@ -131,7 +131,7 @@ function items(parameters) {
  * limit
  */
 function buildQuery(parameters) {
-  return function (qb) {
+  return function(qb) {
     var itemIds = items(parameters);
     if (itemIds) {
       qb.whereIn('id', itemIds);
@@ -160,7 +160,7 @@ function getListOfItems(params, Model) {
     .fetchAll(inclusion(params));
 }
 
-module.exports = function (models, options) {
+module.exports = function(models, options) {
 
   function getModelByResourceName(modelName) {
     if (models.hasOwnProperty(modelName)) {
@@ -170,11 +170,11 @@ module.exports = function (models, options) {
 
   var optionDefaults = {
     // Modify parameters before api takes control
-    paramTransform: function (req) {
+    paramTransform: function(req) {
       return req.query;
     },
     // Response of req.apiData
-    responseTransform: function (req, res) {
+    responseTransform: function(req, res) {
 
       res.json(req.apiData.toJSON());
     }
@@ -185,7 +185,7 @@ module.exports = function (models, options) {
   var responseTransform = options.responseTransform || optionDefaults.responseTransform;
 
   // When resource appears set request Model
-  router.param('resource', function (req, res, next, resource) {
+  router.param('resource', function(req, res, next, resource) {
     var Model = getModelByResourceName(resource);
     if (!Model) {
       return res.status(404).send('Not found');
@@ -197,7 +197,7 @@ module.exports = function (models, options) {
 
   // Resource Collection route
   router.route('/:resource')
-    .get(function (req, res, next) {
+    .get(function(req, res, next) {
       var params = paramTransform(req);
 
       getListOfItems(params, req.Model)
@@ -209,7 +209,7 @@ module.exports = function (models, options) {
           res.status(500).send(err);
         });
     })
-    .post(function (req, res, next) {
+    .post(function(req, res, next) {
       var params = paramTransform(req);
 
       req.Model.collection().forge(req.body).invokeThen('save')
@@ -225,7 +225,7 @@ module.exports = function (models, options) {
 
   // Individual Resource route
   router.route('/:resource/:itemIds')
-    .get(function (req, res, next) {
+    .get(function(req, res, next) {
       var params = paramTransform(req) || {};
       params.itemIds = req.params.itemIds;
 
@@ -238,7 +238,7 @@ module.exports = function (models, options) {
           res.status(500).send(err);
         });
     })
-    .put(function (req, res, next) {
+    .put(function(req, res, next) {
       var params = paramTransform(req) || {};
       params.itemIds = req.params.itemIds;
 
@@ -251,7 +251,7 @@ module.exports = function (models, options) {
           res.status(500).send(err);
         });
     })
-    .delete(function (req, res, next) {
+    .delete(function(req, res, next) {
       req.Model.collection().forge(req.body).invokeThen('destroy')
         .then(function(deletedItems) {
           req.apiData = deletedItems;
