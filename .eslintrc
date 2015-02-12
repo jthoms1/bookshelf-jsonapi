@@ -1,20 +1,6 @@
 {
   "env": {
-    "browser": true,
     "node": true
-  },
-  "settings": {
-    "ecmascript": 6
-  },
-  "ecmaFeatures": {
-    "jsx": true,
-    "blockBindings": true,
-    "defaultParams": true,
-    "forOf": true,
-    "objectLiteralComputedProperties": true,
-    "objectLiteralShorthandMethods": true,
-    "objectLiteralShorthandProperties": true,
-    "templateStrings": true
   },
   "rules": {
     "brace-style": [2, "1tbs", { "allowSingleLine": true}],
@@ -22,6 +8,7 @@
     "comma-style": [2, "last"],
     "consistent-this": [2, "self"],
     "eol-last": [2, true],
+    "indent": [2, 2],
     "new-cap": 0,
     "no-extra-semi": [2, true],
     "no-lonely-if": [2, true],
