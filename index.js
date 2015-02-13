@@ -220,6 +220,9 @@ module.exports = function (models, options) {
         .catch(function(err) {
           res.status(500).send(err);
         });
+    })
+    .all(function(req, res, next) {
+      res.append('Allow', 'GET, POST, OPTIONS').status(405).send();
     });
 
 
@@ -271,6 +274,9 @@ module.exports = function (models, options) {
         .catch(function(err) {
           res.status(500).send(err);
         });
+    })
+    .all(function (req, res, next) {
+      res.append('Allow', 'GET, PUT, DELETE, OPTIONS').status(405).send();
     });
 
   router.use(responseTransform);

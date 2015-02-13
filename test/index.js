@@ -6,12 +6,12 @@ var express = require('express'),
 
 describe('Incorrect resource collection methods', function () {
   var app = express();
-  var models = {};
-
+  var models = {
+    'things': {}
+  };
   app.use('/api', jsonapi(models));
 
   it('PUT should return 405', function(done) {
-
     request(app)
       .put('/api/things')
       .expect(405)
@@ -20,7 +20,6 @@ describe('Incorrect resource collection methods', function () {
   });
 
   it('DELETE should return 405', function (done) {
-
     request(app)
       .del('/api/things')
       .expect(405)
@@ -30,64 +29,64 @@ describe('Incorrect resource collection methods', function () {
 });
 
 describe('Incorrect resource item methods', function () {
+  var app = express();
+  var models = {
+    'things': {}
+  };
+  app.use('/api', jsonapi(models));
+
+  it('POST should return 405', function(done) {
+    request(app)
+    .post('/api/things/1')
+      .expect(405)
+      .expect('Allow', 'GET, PUT, DELETE, OPTIONS')
+      .end(done);
+  });
 });
 
 describe('Unknown resource collection', function() {
+  var app = express();
+  var models = {
+    'things': {}
+  };
+  app.use('/api', jsonapi(models));
+
   it('GET should return 404', function(done) {
-    var app = express();
-    var models = {};
-
-    app.use('/api', jsonapi(models));
-
     request(app)
-      .get('/api/things')
+      .get('/api/users')
       .expect(404)
       .end(done);
   });
   it('POST should return 404', function(done) {
-    var app = express();
-    var models = {};
-
-    app.use('/api', jsonapi(models));
-
     request(app)
-      .post('/api/things')
+      .post('/api/users')
       .expect(404)
       .end(done);
   });
 });
 
 describe('Unknown resource item', function() {
+  var app = express();
+  var models = {
+    'things': {}
+  };
+  app.use('/api', jsonapi(models));
+
   it('GET should return 404', function(done) {
-    var app = express();
-    var models = {};
-
-    app.use('/api', jsonapi(models));
-
     request(app)
-      .get('/api/things/1')
+      .get('/api/users/1')
       .expect(404)
       .end(done);
   });
   it('PUT should return 404', function(done) {
-    var app = express();
-    var models = {};
-
-    app.use('/api', jsonapi(models));
-
     request(app)
-      .put('/api/things/1')
+      .put('/api/users/1')
       .expect(404)
       .end(done);
   });
   it('DELETE should return 404', function(done) {
-    var app = express();
-    var models = {};
-
-    app.use('/api', jsonapi(models));
-
     request(app)
-      .del('/api/things/1')
+      .del('/api/users/1')
       .expect(404)
       .end(done);
   });
