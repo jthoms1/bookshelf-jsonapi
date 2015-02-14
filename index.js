@@ -4,6 +4,8 @@
 var express = require('express');
 var router = express.Router();
 var RESERVED_PARAMS = ['sort', 'include', 'limit', 'itemIds'];
+var COLLECTION_ALLOWED_METHODS = ['GET', 'POST', 'OPTIONS'];
+var RESOURCE_ALLOWED_METHODS = ['GET', 'PUT', 'DELETE', 'OPTIONS'];
 
 /*
  * Relationship URLS
@@ -222,7 +224,10 @@ module.exports = function (models, options) {
         });
     })
     .all(function(req, res, next) {
-      res.append('Allow', 'GET, POST, OPTIONS').status(405).send();
+      if (COLLECTION_ALLOWED_METHODS.indexOf(req.method) !== -1) {
+        return next();
+      }
+      res.append('Allow', COLLECTION_ALLOWED_METHODS.join(', ')).status(405).send();
     });
 
 
@@ -276,7 +281,10 @@ module.exports = function (models, options) {
         });
     })
     .all(function (req, res, next) {
-      res.append('Allow', 'GET, PUT, DELETE, OPTIONS').status(405).send();
+      if (RESOURCE_ALLOWED_METHODS.indexOf(req.method) !== -1) {
+        return next();
+      }
+      res.append('Allow', RESOURCE_ALLOWED_METHODS.join(', ')).status(405).send();
     });
 
   router.use(responseTransform);

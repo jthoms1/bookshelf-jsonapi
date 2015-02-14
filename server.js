@@ -1,7 +1,7 @@
 'use strict';
 
 var express = require('express'),
-  jsonapi = require('..');
+jsonapi = require('./index');
 
 var app = express();
 var models = {things: {}};

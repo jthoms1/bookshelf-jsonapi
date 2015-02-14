@@ -20,6 +20,8 @@
     "bookshelf": "^0.7.9",
     "express": "^4.11.1",
     "mocha": "^2.1.0",
-    "supertest": "^0.15.0"
+    "supertest": "^0.15.0",
+    "knex": "^0.7.3",
+    "sqlite3": "^3.0.5"
   }
 }
