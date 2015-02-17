@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="Jsonapi-bookshelf : JSON API implementation using bookshelf models.">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Jsonapi-bookshelf</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/jthoms1/jsonapi-bookshelf">View on GitHub</a>
+
+          <h1 id="project_title">Jsonapi-bookshelf</h1>
+          <h2 id="project_tagline">JSON API implementation using bookshelf models.</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/jthoms1/jsonapi-bookshelf/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/jthoms1/jsonapi-bookshelf/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <p><a href="https://travis-ci.org/jthoms1/jsonapi-bookshelf"><img src="https://travis-ci.org/jthoms1/jsonapi-bookshelf.png?branch=master" alt="Build
+Status"></a></p>
+
+<h1>
+<a id="jsonapi-bookshelf" class="anchor" href="#jsonapi-bookshelf" aria-hidden="true"><span class="octicon octicon-link"></span></a>jsonapi-bookshelf</h1>
+
+<p>Simple library that uses Bookshelf models and relationships to create a RESTful api based on jsonapi.org spec.</p>
+
+<h1>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage</h1>
+
+<div class="highlight highlight-JavaScript"><pre><span class="pl-s">var</span> jsonapi <span class="pl-k">=</span> <span class="pl-s3">require</span>(<span class="pl-s1"><span class="pl-pds">'</span>jsonapi-bookshelf<span class="pl-pds">'</span></span>);
+<span class="pl-s">var</span> models <span class="pl-k">=</span> <span class="pl-s3">require</span>(<span class="pl-s1"><span class="pl-pds">'</span>./models<span class="pl-pds">'</span></span>); <span class="pl-c">// key model name, value model object</span>
+
+app.use(<span class="pl-s1"><span class="pl-pds">'</span>/api<span class="pl-pds">'</span></span>, jsonapi(models));</pre></div>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Jsonapi-bookshelf maintained by <a href="https://github.com/jthoms1">jthoms1</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
