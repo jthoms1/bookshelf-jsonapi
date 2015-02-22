@@ -7,21 +7,23 @@ exports.up = function(knex) {
       table.string('name');
       table.string('email').unique();
       table.integer('follower_count');
+      table.timestamps();
     })
     .createTable('posts', function(table) {
       table.increments('id').primary();
       table.string('details');
       table.integer('author_id').references('authors.id');
+      table.timestamps();
     });
 };
 
 exports.models = function(bookshelf) {
   return {
-    posts: bookshelf.Model.extend({
+    authors: bookshelf.Model.extend({
       tableName: 'authors',
       idAttribute: 'id'
     }),
-    authors: bookshelf.Model.extend({
+    posts: bookshelf.Model.extend({
       tableName: 'posts',
       idAttribute: 'id'
     })
@@ -30,6 +32,6 @@ exports.models = function(bookshelf) {
 
 exports.down = function(knex) {
   return knex.schema
-    .dropTable('books')
-    .dropTable('summaries');
+    .dropTable('authors')
+    .dropTable('posts');
 };

@@ -1,48 +1,66 @@
 'use strict';
 
-var express = require('express'),
+var path = require('path'),
+  express = require('express'),
   request = require('supertest'),
   knex = require('knex'),
   bookshelf = require('bookshelf'),
-  jsonapi = require('..');
+  jsonapi = require('..'),
+  db = require('./fixtures/tableData');
 
-function errorDone(done) {
-  return function (err, results) {
-    if (err) {
-      console.log(err);
-      throw err;
-    } else {
-      console.log(results);
-      done();
-    }
-  };
-}
+var bk = bookshelf(knex({
+  client: 'sqlite3',
+  debug: true,
+  connection: {
+    filename: path.join(__dirname, 'fixtures/test.sqlite')
+  }
+}));
 
-function setupEnvironment() {
-  var data = require('./fixtures/data');
-  var bk = bookshelf(knex({
-    client: 'sqlite3',
-    connection: {
-      database: 'bookshelf_test',
-      user: 'root',
-      encoding: 'utf8'
-    }
-  }));
-
-  data.up(bk.knex).then(function () {
-
-  });
-}
-
-
-describe('Resource collection methods', function () {
+describe('Valid resources', function () {
   var app = express();
-  app.use('/api', jsonapi());
+  app.use('/api', jsonapi(db.models(bk)));
 
-  it('POST should return a new item with id', function(done) {
-    request(app)
-      .post('/api/posts')
-      .expect(200)
-      .end(errorDone(done));
+  before(function(done) {
+    db.up(bk.knex)
+      .then(function() {
+        done();
+      })
+      .catch(function(err) {
+        console.log(err);
+      });
+  });
+  after(function(done) {
+    db.down(bk.knex)
+      .then(function() {
+        done();
+      })
+      .catch(function(err) {
+        console.log(err);
+      });
+  });
+
+  describe('Resource collection methods', function () {
+    var body = {
+      data: {
+        name: 'Josh Thomas',
+        email: 'jthoms1@gmail.com',
+        'follower_count': 0
+      }
+    };
+    it('POST should return a new item with id', function(done) {
+      request(app)
+        .post('/api/authors')
+        .send(body)
+        .expect(200)
+        .expect('Content-Type', /json/)
+        .end(function(err, results) {
+          if (err) {
+            console.log(err);
+            throw err;
+          }
+          console.log(results.body);
+          done();
+        });
+    });
   });
 });

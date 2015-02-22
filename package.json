@@ -23,5 +23,8 @@
     "supertest": "^0.15.0",
     "knex": "^0.7.3",
     "sqlite3": "^3.0.5"
+  },
+  "dependencies": {
+    "body-parser": "^1.12.0"
   }
 }

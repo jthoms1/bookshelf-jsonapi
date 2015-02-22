@@ -2,7 +2,9 @@
 'use strict';
 
 var express = require('express');
+var bodyParser = require('body-parser');
 var router = express.Router();
+var jsonParser = bodyParser.json();
 var RESERVED_PARAMS = ['sort', 'include', 'limit', 'itemIds'];
 var COLLECTION_ALLOWED_METHODS = ['GET', 'POST', 'OPTIONS'];
 var RESOURCE_ALLOWED_METHODS = ['GET', 'PUT', 'DELETE', 'OPTIONS'];
@@ -177,7 +179,7 @@ module.exports = function (models, options) {
     },
     // Response of req.apiData
     responseTransform: function (req, res) {
-      res.json(req.apiData.toJSON());
+      res.json(req.apiData);
     }
   };
 
@@ -189,7 +191,9 @@ module.exports = function (models, options) {
   router.param('resource', function (req, res, next, resource) {
     var Model = getModelByResourceName(resource);
     if (!Model) {
-      return res.status(404).send('Not found');
+      return res.status(404).json({
+        msg: 'Not found'
+      });
     } else {
       req.Model = Model;
       next();
@@ -207,16 +211,24 @@ module.exports = function (models, options) {
           next();
         })
         .catch(function(err) {
-          res.status(500).send(err);
+          res.status(500).json(err);
         });
     })
-    .post(function (req, res, next) {
+    .post(jsonParser, function (req, res, next) {
       var params = paramTransform(req);
-      var collection = req.Model.collection(req.body);
+      if (req.body === null || typeof req.body !== 'object' || !req.body.hasOwnProperty('data')) {
+        return res.status(500).json({
+          msg: 'Request object must contain a data attribute.'
+        });
+      }
 
-      collection.invokeThen('save')
-        .then(function() {
-          req.apiData = collection;
+      var data = req.body.data;
+
+      new req.Model(data).save()
+        .then(function(model) {
+          var respJSON = {};
+          respJSON.data = model.toJSON();
+          req.apiData = respJSON;
           next();
         })
         .catch(function(err) {
@@ -246,7 +258,7 @@ module.exports = function (models, options) {
           res.status(500).send(err);
         });
     })
-    .put(function (req, res, next) {
+    .put(jsonParser, function (req, res, next) {
       var params = paramTransform(req) || {};
       params.itemIds = req.params.itemIds;
 
