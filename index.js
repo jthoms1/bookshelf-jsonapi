@@ -167,7 +167,7 @@ function getListOfItems(params, Model) {
 module.exports = function (models, options) {
 
   function getModelByResourceName(modelName) {
-    if (models.hasOwnProperty(modelName)) {
+    if (models && modelName && models.hasOwnProperty(modelName)) {
       return models[modelName];
     }
   }

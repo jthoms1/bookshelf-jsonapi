@@ -10,7 +10,6 @@ var path = require('path'),
 
 var bk = bookshelf(knex({
   client: 'sqlite3',
-  debug: true,
   connection: {
     filename: path.join(__dirname, 'fixtures/test.sqlite')
   }
@@ -53,12 +52,11 @@ describe('Valid resources', function () {
         .send(body)
         .expect(200)
         .expect('Content-Type', /json/)
-        .end(function(err, results) {
+        .end(function(err) {
           if (err) {
             console.log(err);
             throw err;
           }
-          console.log(results.body);
           done();
         });
     });
