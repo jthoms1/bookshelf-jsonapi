@@ -196,6 +196,7 @@ module.exports = function (models, options) {
       });
     } else {
       req.Model = Model;
+      req.ResourceName = resource;
       next();
     }
   });
@@ -207,7 +208,11 @@ module.exports = function (models, options) {
 
       getListOfItems(params, req.Model)
         .then(function(gatheredItems) {
-          req.apiData = gatheredItems;
+          var respJSON = {};
+          respJSON.data = (gatheredItems || []).map(function(item) {
+            item.type = req.ResourceName;
+          });
+          req.apiData = respJSON;
           next();
         })
         .catch(function(err) {
@@ -228,6 +233,7 @@ module.exports = function (models, options) {
         .then(function(model) {
           var respJSON = {};
           respJSON.data = model.toJSON();
+          respJSON.data.type = req.ResourceName;
           req.apiData = respJSON;
           next();
         })
