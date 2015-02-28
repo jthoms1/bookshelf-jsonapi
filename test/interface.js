@@ -1,35 +1,19 @@
 'use strict';
 
-var path = require('path'),
-  express = require('express'),
+var express = require('express'),
   request = require('supertest'),
-  knex = require('knex'),
-  bookshelf = require('bookshelf'),
   jsonapi = require('..'),
-  db = require('./fixtures/tableData'),
-  expect = require('expect.js');
-
-var bk = bookshelf(knex({
-  client: 'sqlite3',
-  connection: {
-    filename: path.join(__dirname, 'fixtures/test.sqlite')
-  }
-}));
-
-var headerContains = function (header, content) {
-  return function (res) {
-    if (res.headers[header.toLowerCase()].indexOf(content) === -1) {
-      throw new Error('Header "' + header + '" does not contain "' + content + '".');
-    }
-  };
-};
+  db = require('./util/db'),
+  migrate = require('./util/migrations'),
+  expect = require('expect.js'),
+  helper = require('./util/helper');
 
 describe('Valid resources', function () {
   var app = express();
-  app.use('/api', jsonapi(db.models(bk)));
+  app.use('/api', jsonapi(db.models));
 
   before(function(done) {
-    db.up(bk.knex)
+    migrate.up(db.knex)
       .then(function() {
         done();
       })
@@ -38,7 +22,7 @@ describe('Valid resources', function () {
       });
   });
   after(function(done) {
-    db.down(bk.knex)
+    migrate.down(db.knex)
       .then(function() {
         done();
       })
@@ -53,7 +37,7 @@ describe('Valid resources', function () {
       request(app)
         .get('/api/authors')
         .expect(200)
-        .expect(headerContains('Content-Type', 'application/vnd.api+json'))
+        .expect(helper.headerContains('Content-Type', 'application/vnd.api+json'))
         .end(function(err, results) {
           if (err) {
             console.log(err);
@@ -79,7 +63,7 @@ describe('Valid resources', function () {
         .post('/api/authors')
         .send(reqBody)
         .expect(201)
-        .expect(headerContains('Content-Type', 'application/vnd.api+json'))
+        .expect(helper.headerContains('Content-Type', 'application/vnd.api+json'))
         .end(function(err, results) {
           if (err) {
             console.log(err);

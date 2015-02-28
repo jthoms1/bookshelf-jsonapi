@@ -1,26 +1,18 @@
 'use strict';
 
-var path = require('path'),
-  express = require('express'),
+var express = require('express'),
   request = require('supertest'),
-  knex = require('knex'),
-  bookshelf = require('bookshelf'),
   jsonapi = require('..'),
-  db = require('./fixtures/tableData');
-
-var bk = bookshelf(knex({
-  client: 'sqlite3',
-  connection: {
-    filename: path.join(__dirname, 'fixtures/test.sqlite')
-  }
-}));
+  db = require('./util/db'),
+  migrate = require('./util/migrations');
+  //expect = require('expect.js');
 
 describe('Invalid resources', function () {
   var app = express();
-  app.use('/api', jsonapi(db.models(bk)));
+  app.use('/api', jsonapi(db.models));
 
   before(function(done) {
-    db.up(bk.knex)
+    migrate.up(db.knex)
       .then(function() {
         done();
       })
@@ -29,7 +21,7 @@ describe('Invalid resources', function () {
       });
   });
   after(function(done) {
-    db.down(bk.knex)
+    migrate.down(db.knex)
       .then(function() {
         done();
       })

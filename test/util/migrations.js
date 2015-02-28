@@ -17,19 +17,6 @@ exports.up = function(knex) {
     });
 };
 
-exports.models = function(bookshelf) {
-  return {
-    authors: bookshelf.Model.extend({
-      tableName: 'authors',
-      idAttribute: 'id'
-    }),
-    posts: bookshelf.Model.extend({
-      tableName: 'posts',
-      idAttribute: 'id'
-    })
-  };
-};
-
 exports.down = function(knex) {
   return knex.schema
     .dropTable('authors')
