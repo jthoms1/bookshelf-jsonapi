@@ -242,8 +242,10 @@ module.exports = function (models, options) {
           ]
         });
       }
+      delete req.body.data.type;
 
-      new req.Model(req.body.data)
+      req.Model
+        .forge(req.body.data)
         .save()
         .then(function(model) {
           var respJSON = {};
@@ -253,7 +255,6 @@ module.exports = function (models, options) {
           respJSON.links.self = req.path + '/' + model.id;
           req.apiData = respJSON;
           res.status(201);
-          console.log(respJSON);
           next();
         })
         .catch(function(err) {
