@@ -78,7 +78,24 @@ describe('Valid resources', function () {
         });
     });
 
-    it('DELETE should return an empty body and a 204', function(done) {
+    it('GET resources should return an object with a data array', function(done) {
+      request(app)
+        .get('/api/authors')
+        .expect(200)
+        .expect(helper.headerContains('Content-Type', 'application/vnd.api+json'))
+        .end(function(err, results) {
+          if (err) {
+            console.log(err);
+            throw err;
+          }
+          var body = JSON.parse(results.text);
+          expect(body.data).to.be.an('array');
+          expect(body.data).to.have.length(1);
+          done();
+        });
+    });
+
+    it('DELETE a resource should return an empty body and a 204', function(done) {
       request(app)
         .del('/api/authors/1')
         .expect(204)

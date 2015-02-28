@@ -13,6 +13,9 @@ var ALLOWED_METHODS = {
 };
 var CONTENT_TYPE = 'application/vnd.api+json';
 
+function checkResourceType() {
+}
+
 /*
  * Relationship URLS
  *
@@ -137,6 +140,7 @@ function items(parameters) {
  */
 function buildQuery(parameters) {
   return function (qb) {
+
     var itemId = items(parameters);
     if (itemId) {
       qb.whereIn('id', itemId);
@@ -224,6 +228,7 @@ module.exports = function (models, options) {
     })
     .post(jsonParser, function (req, res, next) {
       var params = paramTransform(req);
+
       if (req.body === null || typeof req.body !== 'object' || !req.body.hasOwnProperty('data')) {
         return res.status(400).json({
           errors: [
@@ -233,6 +238,7 @@ module.exports = function (models, options) {
           ]
         });
       }
+
       if (!req.body.data.hasOwnProperty('type') && req.body.data.type !== req.ResourceName) {
         return res.status(409).json({
           errors: [
@@ -242,7 +248,10 @@ module.exports = function (models, options) {
           ]
         });
       }
+
+      // Remove type when saving
       delete req.body.data.type;
+      delete req.body.data.links;
 
       req.Model
         .forge(req.body.data)
@@ -252,7 +261,7 @@ module.exports = function (models, options) {
           respJSON.data = model.toJSON();
           respJSON.links = {};
           respJSON.data.type = req.ResourceName;
-          respJSON.links.self = req.path + '/' + model.id;
+          respJSON.links.self = req.path;
           req.apiData = respJSON;
           res.status(201);
           next();
@@ -276,8 +285,14 @@ module.exports = function (models, options) {
       params.itemId = req.params.itemId;
 
       getListOfItems(params, req.Model)
-        .then(function(resourceGatheredItems) {
-          req.apiData = resourceGatheredItems;
+        .then(function(resourceItems) {
+          var model = resourceItems.toJSON()[0];
+          var respJSON = {};
+          respJSON.data = model;
+          respJSON.links = {};
+          respJSON.data.type = req.ResourceName;
+          respJSON.links.self = req.path;
+          req.apiData = respJSON;
           next();
         })
         .catch(function(err) {
@@ -287,6 +302,16 @@ module.exports = function (models, options) {
     .put(jsonParser, function (req, res, next) {
       var params = paramTransform(req) || {};
       params.itemId = req.params.itemId;
+
+      if (req.body === null || typeof req.body !== 'object' || !req.body.hasOwnProperty('data')) {
+        return res.status(400).json({
+          errors: [
+            {
+              title: 'Request object must contain a data attribute.'
+            }
+          ]
+        });
+      }
 
       if (!req.body.data.hasOwnProperty('type') && req.body.data.type !== req.ResourceName) {
         return res.status(409).json({
@@ -298,10 +323,20 @@ module.exports = function (models, options) {
         });
       }
 
-      var model = new req.Model(req.body);
-      model.save()
-        .then(function() {
-          req.apiData = model;
+      // Remove type when saving
+      delete req.body.data.type;
+      delete req.body.data.links;
+
+      req.Model
+        .forge(req.body.data)
+        .save()
+        .then(function(model) {
+          var respJSON = {};
+          respJSON.data = model.toJSON();
+          respJSON.links = {};
+          respJSON.data.type = req.ResourceName;
+          respJSON.links.self = req.path;
+          req.apiData = respJSON;
           next();
         })
         .catch(function(err) {
