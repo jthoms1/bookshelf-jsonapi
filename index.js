@@ -259,9 +259,9 @@ module.exports = function (models, options) {
         .then(function(model) {
           var respJSON = {};
           respJSON.data = model.toJSON();
-          respJSON.links = {};
           respJSON.data.type = req.ResourceName;
-          respJSON.links.self = req.path;
+          respJSON.data.links = {};
+          respJSON.data.links.self = req.path;
           req.apiData = respJSON;
           res.status(201);
           next();
@@ -289,9 +289,9 @@ module.exports = function (models, options) {
           var model = resourceItems.toJSON()[0];
           var respJSON = {};
           respJSON.data = model;
-          respJSON.links = {};
           respJSON.data.type = req.ResourceName;
-          respJSON.links.self = req.path;
+          respJSON.data.links = {};
+          respJSON.data.links.self = req.path;
           req.apiData = respJSON;
           next();
         })

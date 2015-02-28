@@ -19,9 +19,9 @@ module.exports = {
       tableName: 'authors',
       idAttribute: 'id'
     }),
-    posts: bk.Model.extend({
-      tableName: 'posts',
-      idAttribute: 'id'
+    books: bk.Model.extend({
+      tableName: 'books',
+      idAttribute: 'isbn10'
     })
   }
 };
