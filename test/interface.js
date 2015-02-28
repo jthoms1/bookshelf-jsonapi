@@ -16,6 +16,14 @@ var bk = bookshelf(knex({
   }
 }));
 
+var headerContains = function (header, content) {
+  return function (res) {
+    if (res.headers[header.toLowerCase()].indexOf(content) === -1) {
+      throw new Error('Header "' + header + '" does not contain "' + content + '".');
+    }
+  };
+};
+
 describe('Valid resources', function () {
   var app = express();
   app.use('/api', jsonapi(db.models(bk)));
@@ -45,21 +53,23 @@ describe('Valid resources', function () {
       request(app)
         .get('/api/authors')
         .expect(200)
-        .expect('Content-Type', /json/)
+        .expect(headerContains('Content-Type', 'application/vnd.api+json'))
         .end(function(err, results) {
           if (err) {
             console.log(err);
             throw err;
           }
-          expect(results.body.data).to.be.an('array');
-          expect(results.body.data).to.have.length(0);
+          var body = JSON.parse(results.text);
+          expect(body.data).to.be.an('array');
+          expect(body.data).to.have.length(0);
           done();
         });
     });
 
     it('POST should return a new item with id', function(done) {
-      var body = {
+      var reqBody = {
         data: {
+          type: 'authors',
           name: 'Josh Thomas',
           email: 'jthoms1@gmail.com',
           'follower_count': 0
@@ -67,18 +77,19 @@ describe('Valid resources', function () {
       };
       request(app)
         .post('/api/authors')
-        .send(body)
-        .expect(200)
-        .expect('Content-Type', /json/)
+        .send(reqBody)
+        .expect(201)
+        .expect(headerContains('Content-Type', 'application/vnd.api+json'))
         .end(function(err, results) {
           if (err) {
             console.log(err);
             throw err;
           }
-          expect(results.body.data).to.be.an('object');
-          expect(results.body.data).to.have.keys(['name', 'email', 'follower_count', 'type', 'id']);
-          expect(results.body.data.type).to.be.equal('authors');
-          expect(results.body.data.id).to.be.equal(1);
+          var body = JSON.parse(results.text);
+          expect(body.data).to.be.an('object');
+          expect(body.data).to.have.keys(['name', 'email', 'follower_count', 'type', 'id']);
+          expect(body.data.type).to.be.equal('authors');
+          expect(body.data.id).to.be.equal(1);
           done();
         });
     });

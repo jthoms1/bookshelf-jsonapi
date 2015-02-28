@@ -5,9 +5,13 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var router = express.Router();
 var jsonParser = bodyParser.json();
-var RESERVED_PARAMS = ['sort', 'include', 'limit', 'itemIds'];
-var COLLECTION_ALLOWED_METHODS = ['GET', 'POST', 'OPTIONS'];
-var RESOURCE_ALLOWED_METHODS = ['GET', 'PUT', 'DELETE', 'OPTIONS'];
+
+var RESERVED_PARAMS = ['sort', 'include', 'limit', 'itemId'];
+var ALLOWED_METHODS = {
+  COLLECTION: ['GET', 'POST', 'OPTIONS'],
+  RESOURCE: ['GET', 'PUT', 'DELETE', 'OPTIONS']
+};
+var CONTENT_TYPE = 'application/vnd.api+json';
 
 /*
  * Relationship URLS
@@ -119,26 +123,23 @@ function limit(parameters) {
 }
 
 /*
- * List of itemIds to array
+ * List of itemId to array
  */
 function items(parameters) {
-  if (parameters.itemIds) {
-    return parameters.itemIds.split(',');
-  }
+  return parameters.itemId;
 }
 
 /*
  * Build the query for bookshelf using knex syntax
  *
- * items
  * sort
  * limit
  */
 function buildQuery(parameters) {
   return function (qb) {
-    var itemIds = items(parameters);
-    if (itemIds) {
-      qb.whereIn('id', itemIds);
+    var itemId = items(parameters);
+    if (itemId) {
+      qb.whereIn('id', itemId);
     }
 
     var filterWhere = filters(parameters);
@@ -179,7 +180,9 @@ module.exports = function (models, options) {
     },
     // Response of req.apiData
     responseTransform: function (req, res) {
-      res.json(req.apiData);
+      return res
+        .set('Content-Type', CONTENT_TYPE)
+        .json(req.apiData);
     }
   };
 
@@ -222,19 +225,35 @@ module.exports = function (models, options) {
     .post(jsonParser, function (req, res, next) {
       var params = paramTransform(req);
       if (req.body === null || typeof req.body !== 'object' || !req.body.hasOwnProperty('data')) {
-        return res.status(500).json({
-          msg: 'Request object must contain a data attribute.'
+        return res.status(400).json({
+          errors: [
+            {
+              title: 'Request object must contain a data attribute.'
+            }
+          ]
+        });
+      }
+      if (!req.body.data.hasOwnProperty('type') && req.body.data.type !== req.ResourceName) {
+        return res.status(409).json({
+          errors: [
+            {
+              title: 'Resource type attribute should be equal to "' + req.ResourceName + '".'
+            }
+          ]
         });
       }
 
-      var data = req.body.data;
-
-      new req.Model(data).save()
+      new req.Model(req.body.data)
+        .save()
         .then(function(model) {
           var respJSON = {};
           respJSON.data = model.toJSON();
+          respJSON.links = {};
           respJSON.data.type = req.ResourceName;
+          respJSON.links.self = req.path + '/' + model.id;
           req.apiData = respJSON;
+          res.status(201);
+          console.log(respJSON);
           next();
         })
         .catch(function(err) {
@@ -242,18 +261,18 @@ module.exports = function (models, options) {
         });
     })
     .all(function(req, res, next) {
-      if (COLLECTION_ALLOWED_METHODS.indexOf(req.method) !== -1) {
+      if (ALLOWED_METHODS.COLLECTION.indexOf(req.method) !== -1) {
         return next();
       }
-      res.append('Allow', COLLECTION_ALLOWED_METHODS.join(', ')).status(405).send();
+      res.append('Allow', ALLOWED_METHODS.COLLECTION.join(', ')).status(405).send();
     });
 
 
   // Individual Resource route
-  router.route('/:resource/:itemIds')
+  router.route('/:resource/:itemId')
     .get(function (req, res, next) {
       var params = paramTransform(req) || {};
-      params.itemIds = req.params.itemIds;
+      params.itemId = req.params.itemId;
 
       getListOfItems(params, req.Model)
         .then(function(resourceGatheredItems) {
@@ -266,16 +285,22 @@ module.exports = function (models, options) {
     })
     .put(jsonParser, function (req, res, next) {
       var params = paramTransform(req) || {};
-      params.itemIds = req.params.itemIds;
+      params.itemId = req.params.itemId;
 
-      var mockItemList = items(params).map(function(itemId) {
-        return {id: itemId};
-      });
-      //TODO Check that url ids match request body ids
-      var collection = req.Model.collection(req.body);
-      collection.invokeThen('save')
+      if (!req.body.data.hasOwnProperty('type') && req.body.data.type !== req.ResourceName) {
+        return res.status(409).json({
+          errors: [
+            {
+              title: 'Resource type attribute should be equal to "' + req.ResourceName + '".'
+            }
+          ]
+        });
+      }
+
+      var model = new req.Model(req.body);
+      model.save()
         .then(function() {
-          req.apiData = collection;
+          req.apiData = model;
           next();
         })
         .catch(function(err) {
@@ -284,13 +309,10 @@ module.exports = function (models, options) {
     })
     .delete(function (req, res, next) {
       var params = paramTransform(req) || {};
-      params.itemIds = req.params.itemIds;
+      params.itemId = req.params.itemId;
 
-      var mockItemList = items(params).map(function(itemId) {
-        return {id: itemId};
-      });
-      var collection = req.Model.collection(mockItemList);
-      collection.invokeThen('destroy')
+      var model = new req.Model({id: params.itemId});
+      model.destroy()
         .then(function() {
           res.status(204).send();
         })
@@ -299,10 +321,10 @@ module.exports = function (models, options) {
         });
     })
     .all(function (req, res, next) {
-      if (RESOURCE_ALLOWED_METHODS.indexOf(req.method) !== -1) {
+      if (ALLOWED_METHODS.RESOURCE.indexOf(req.method) !== -1) {
         return next();
       }
-      res.append('Allow', RESOURCE_ALLOWED_METHODS.join(', ')).status(405).send();
+      res.append('Allow', ALLOWED_METHODS.RESOURCE.join(', ')).status(405).send();
     });
 
   router.use(responseTransform);
