@@ -16,9 +16,6 @@ var CONTENT_TYPE = 'application/vnd.api+json';
 
 /*
  * Build the query for bookshelf using knex syntax
- *
- * sort
- * limit
  */
 function buildQuery(parameters) {
   return function (qb) {

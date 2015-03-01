@@ -69,28 +69,27 @@ exports.parseLinks = function(parameters) {
  *   .orderBy(column, [direction])
  */
 exports.parseSorting = function(parameters) {
-  var direction, column;
+  var direction,
+    column;
 
-  // If there is no sort param then sort on id ascending
-  if (!parameters.hasOwnProperty('sort')) {
-    direction = 'asc';
-    column = 'id';
-
-  // If there is a sort param and it starts with a '-' then use descending order
-  } else if (parameters.sort.charAt(0) === '-') {
-    direction = 'desc';
-    column = parameters.sort.substr(1);
-
-  // Otherwise assume ascending order on the sort param
-  } else {
-    direction = 'asc';
-    column = parameters.sort;
+  if (!parameters || !parameters.hasOwnProperty('sort')) {
+    return undefined;
   }
 
-  return {
-    column: column,
-    direction: direction
-  };
+  // If there is a sort param and it starts with a '-' then use descending order
+  if (parameters.sort.charAt(0) === '-') {
+    return {
+      direction: 'desc',
+      column: parameters.sort.substr(1)
+    };
+
+  // If there is a sort param and it starts with a '+' then use ascending order
+  } else if (parameters.sort.charAt(0) === '+') {
+    return {
+      direction: 'asc',
+      column: parameters.sort.substr(1)
+    };
+  }
 };
 
 /*

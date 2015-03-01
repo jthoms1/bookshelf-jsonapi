@@ -7,25 +7,41 @@ describe('Utility Module', function () {
   describe('Filter Testing', function () {
     it('should return an empty object by default', function(done) {
       var filterObj = utils.parseFilters({});
-      expect(filterObj).to.be.an('object');
       expect(filterObj).to.eql({});
       done();
     });
+
+    it('should return an object key/value from what is supplied', function(done) {
+      var filterObj = utils.parseFilters({
+        name: 'test',
+        count: 100,
+        twitter: '@jthoms1'
+      });
+      expect(filterObj).to.eql({
+        name: 'test',
+        count: 100,
+        twitter: '@jthoms1'
+      });
+      done();
+    });
+
     it('should return no filter results for reserved words', function(done) {
       var filterObj = utils.parseFilters({
         sort: 1,
         include: 1,
         limit: 1,
-        itemId: 1
+        itemId: 1,
+        name: 'test'
       });
-      expect(filterObj).to.be.an('object');
-      expect(filterObj).to.eql({});
+      expect(filterObj).to.eql({
+        name: 'test'
+      });
       done();
     });
   });
 
   describe('Links Testing', function () {
-    it('should return an object with empty data array when no resources exist', function(done) {
+    it('should return undefined if no links are referenced', function(done) {
       var linkObj = utils.parseLinks({});
       expect(linkObj).to.be(undefined);
       done();
@@ -44,12 +60,39 @@ describe('Utility Module', function () {
   });
 
   describe('Sorting Testing', function () {
-    it('should contain a default sort of ascending on id column', function(done) {
+    it('should return undefined if there is no sort applied', function(done) {
       var sortObj = utils.parseSorting({});
+      expect(sortObj).to.be(undefined);
+      done();
+    });
+
+    it('should identify a + before an attribute as being ascending', function(done) {
+      var sortObj = utils.parseSorting({
+        sort: '+name'
+      });
       expect(sortObj).to.be.an('object');
       expect(sortObj).to.only.have.keys(['column', 'direction']);
-      expect(sortObj.column).to.be('id');
+      expect(sortObj.column).to.be('name');
       expect(sortObj.direction).to.be('asc');
+      done();
+    });
+
+    it('should identify a - before an attribute as being descending', function(done) {
+      var sortObj = utils.parseSorting({
+        sort: '-name'
+      });
+      expect(sortObj).to.be.an('object');
+      expect(sortObj).to.only.have.keys(['column', 'direction']);
+      expect(sortObj.column).to.be('name');
+      expect(sortObj.direction).to.be('desc');
+      done();
+    });
+
+    it('should return undefined if neither a - or + is supplied before an attribute', function(done) {
+      var sortObj = utils.parseSorting({
+        sort: 'name'
+      });
+      expect(sortObj).to.be(undefined);
       done();
     });
   });
