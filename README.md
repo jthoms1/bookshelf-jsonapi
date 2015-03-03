@@ -1,5 +1,5 @@
 [![Build
-Status](https://travis-ci.org/jthoms1/jsonapi-bookshelf.png?branch=master)](https://travis-ci.org/jthoms1/jsonapi-bookshelf)
+Status](https://travis-ci.org/jthoms1/jsonapi-bookshelf.svg?branch=master)](https://travis-ci.org/jthoms1/jsonapi-bookshelf)
 
 
 jsonapi-bookshelf
