@@ -51,6 +51,20 @@ describe('GET Resource', function () {
 
   describe('Valid Scenarios', function () {
     it('should return an object', function(done) {
+      var mock = {
+        'data': {
+          'id': 1,
+          'name': 'Neal Stephenson',
+          'twitter': '@nealstephenson',
+          'follower_count': 35700,
+          'created_at': null,
+          'updated_at': null,
+          'type': 'authors',
+          'links': {
+            'self': '/authors/1'
+          }
+        }
+      };
       request(app)
         .get('/api/authors/1')
         .expect(200)
@@ -61,10 +75,7 @@ describe('GET Resource', function () {
             throw err;
           }
           var body = JSON.parse(results.text);
-          expect(body.data).to.be.an('object');
-          expect(body.data).to.have.keys(['name', 'twitter', 'follower_count', 'type', 'id', 'links']);
-          expect(body.data.id).to.be.equal(1);
-          expect(body.data.type).to.be.equal('authors');
+          expect(body).to.eql(mock);
           done();
         });
     });

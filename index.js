@@ -6,6 +6,7 @@ var bodyParser = require('body-parser');
 var router = express.Router();
 var jsonParser = bodyParser.json();
 var utils = require('./utils');
+var assign = require('object-assign');
 
 var RESERVED_PARAMS = ['sort', 'include', 'limit', 'itemId'];
 var ALLOWED_METHODS = {
@@ -205,15 +206,32 @@ module.exports = function (models, options) {
       delete req.body.data.type;
       delete req.body.data.links;
 
-      req.Model
-        .forge(req.body.data)
-        .save()
-        .then(function(model) {
+      var previousAttributes;
+      var model = new req.Model();
+      var fetchParams = {};
+      fetchParams[model.idAttribute] = params.itemId;
+
+      model
+        .fetch(fetchParams)
+        .then(function() {
+          // Create hash of the expected updates to the model.
+          previousAttributes = JSON.stringify(assign(model.toJSON(), req.body.data));
+          return model.save(req.body.data, {patch: true});
+        })
+        .then(function() {
+          // Create hash of the actual updates to the model.
+          var currentAttributes = JSON.stringify(model.toJSON());
+
+          // Did the act of saving cause additional changes to the model data
+          if (currentAttributes === previousAttributes) {
+            return res.status(204).send();
+          }
+
           var respJSON = {};
           respJSON.data = model.toJSON();
-          respJSON.links = {};
           respJSON.data.type = req.ResourceName;
-          respJSON.links.self = req.path;
+          respJSON.data.links = {};
+          respJSON.data.links.self = req.path;
           req.apiData = respJSON;
           next();
         })

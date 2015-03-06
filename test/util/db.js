@@ -21,7 +21,11 @@ module.exports = {
     }),
     books: bk.Model.extend({
       tableName: 'books',
-      idAttribute: 'isbn10'
+      idAttribute: 'isbn10',
+      hasTimestamps: ['created_at', 'updated_at'],
+      author: function () {
+        return this.belongsTo(module.exports.models.authors, 'author_id');
+      }
     })
   }
 };

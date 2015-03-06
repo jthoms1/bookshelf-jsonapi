@@ -52,11 +52,23 @@ describe('POST Resource', function () {
   describe('Valid Scenarios', function () {
     it('should return a new item with id', function(done) {
       var reqBody = {
-        data: {
-          type: 'authors',
-          name: 'Richard Stallman',
-          twitter: null,
+        'data': {
+          'type': 'authors',
+          'name': 'Richard Stallman',
+          'twitter': null,
           'follower_count': 0
+        }
+      };
+      var mock = {
+        'data': {
+          'type': 'authors',
+          'name': 'Richard Stallman',
+          'twitter': null,
+          'follower_count': 0,
+          'id': 6,
+          'links': {
+            'self': '/authors'
+          }
         }
       };
       request(app)
@@ -70,9 +82,7 @@ describe('POST Resource', function () {
             throw err;
           }
           var body = JSON.parse(results.text);
-          expect(body.data).to.be.an('object');
-          expect(body.data).to.have.keys(['name', 'twitter', 'follower_count', 'type', 'id', 'links']);
-          expect(body.data.type).to.be.equal('authors');
+          expect(body).to.eql(mock);
           done();
         });
     });

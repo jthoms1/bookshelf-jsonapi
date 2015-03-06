@@ -50,16 +50,52 @@ describe('PUT Resource', function () {
   });
 
   describe('Valid Scenarios', function () {
-    it('should accept only updating resource attributes', function(done) {
+    it('should return a 204 if no values updated other than those sent', function(done) {
       var reqBody = {
-        data: {
-          id: 1,
-          type: 'authors',
-          'follower_count': 10
+        'data': {
+          'id': 1,
+          'type': 'authors',
+          'follower_count': 12
         }
       };
       request(app)
         .put('/api/authors/1')
+        .send(reqBody)
+        .expect(204)
+        .end(function(err) {
+          if (err) {
+            console.log(err);
+            throw err;
+          }
+          done();
+        });
+    });
+
+    it('should return a 200 and all resources if values updated other than those sent', function (done) {
+      var reqBody = {
+        'data': {
+          'isbn10': '0553380958',
+          'publish_year': 2001,
+          'type': 'books'
+        }
+      };
+      var mock = {
+        'data': {
+          'isbn10': '0553380958',
+          'created_at': null,
+          'name': 'Snow Crash',
+          'publish_year': 2001,
+          'page_length': 440,
+          'author_id': 1,
+          'type': 'books',
+          'links': {
+            'self': '/books/0553380958'
+          }
+        }
+      };
+
+      request(app)
+        .put('/api/books/0553380958')
         .send(reqBody)
         .expect(200)
         .expect(helper.headerContains('Content-Type', 'application/vnd.api+json'))
@@ -69,11 +105,9 @@ describe('PUT Resource', function () {
             throw err;
           }
           var body = JSON.parse(results.text);
-          expect(body.data).to.be.an('object');
-          expect(body.data).to.have.keys(['follower_count', 'type', 'id']);
-          expect(body.data.type).to.be.equal('authors');
-          expect(body.data.id).to.be.equal(1);
-          expect(body.data.follower_count).to.be.equal(10);
+          expect(body.data).to.have.key('updated_at');
+          delete body.data.updated_at;
+          expect(body).to.eql(mock);
           done();
         });
     });
