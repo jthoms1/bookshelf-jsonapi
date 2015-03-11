@@ -106,4 +106,146 @@ describe('Utility Module', function () {
       done();
     });
   });
+
+  describe('Deep to Shallow Testing', function () {
+    it('should convert object to array of items', function(done) {
+      var data = {
+        id: '10',
+        name: 'Gus',
+        books: [
+          {
+            id: '1',
+            name: 'that one book',
+            authorId: '10'
+          }, {
+            id: '2',
+            name: 'that other book',
+            authorId: '10'
+          }
+        ]
+      };
+      var mockArray = {
+        books: [
+          {
+            id: '1',
+            name: 'that one book',
+            authorId: '10'
+          },
+          {
+            id: '2',
+            name: 'that other book',
+            authorId: '10'
+          }
+        ]
+      };
+      var resultsArray = utils.deepToShallow(data);
+      expect(resultsArray).to.eql(mockArray);
+      done();
+    });
+
+    it('should convert multiple sub items to array of items', function(done) {
+      var data = {
+        id: '10',
+        name: 'Gus',
+        groups: [
+          {
+            id: '30',
+            name: 'that one group'
+          }
+        ],
+        books: [
+          {
+            id: '1',
+            name: 'that one book',
+            authorId: '10'
+          }, {
+            id: '2',
+            name: 'that other book',
+            authorId: '10'
+          }
+        ]
+      };
+      var mockArray = {
+        groups: [
+          {
+            id: '30',
+            name: 'that one group'
+          }
+        ],
+        books: [
+          {
+            id: '1',
+            name: 'that one book',
+            authorId: '10'
+          },
+          {
+            id: '2',
+            name: 'that other book',
+            authorId: '10'
+          }
+        ]
+      };
+      var resultsArray = utils.deepToShallow(data);
+      expect(resultsArray).to.eql(mockArray);
+      done();
+    });
+
+    it('should convert multiple sub items to array of items', function(done) {
+      var data = {
+        id: '10',
+        name: 'Gus',
+        books: [
+          {
+            id: '1',
+            name: 'that one book',
+            authorId: '10',
+            groups: [
+              {
+                id: '30',
+                name: 'that one group',
+                members: {
+                  id: '1',
+                  name: 'John'
+                }
+              }
+            ]
+          }, {
+            id: '2',
+            name: 'that other book',
+            authorId: '10'
+          }
+        ]
+      };
+      var mockArray = {
+        groups: [
+          {
+            id: '30',
+            name: 'that one group'
+          }
+        ],
+        members: [
+          {
+            id: '1',
+            name: 'John'
+          }
+        ],
+        books: [
+          {
+            id: '1',
+            name: 'that one book',
+            authorId: '10'
+          },
+          {
+            id: '2',
+            name: 'that other book',
+            authorId: '10'
+          }
+        ]
+      };
+      var resultsArray = utils.deepToShallow(data);
+      console.log(resultsArray);
+      expect(resultsArray).to.eql(mockArray);
+      done();
+    });
+  });
 });

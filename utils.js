@@ -113,3 +113,29 @@ exports.parseLimits = function(parameters) {
     limit: resourcelimit
   };
 };
+
+/*
+ * Convert object relationships to array of objects
+ */
+exports.deepToShallow = function(resource, response) {
+
+  function isObject(key) {
+    return resource[key] !== null && typeof resource[key] === 'object';
+  }
+
+  response = response || {};
+
+  Object.keys(resource)
+    .forEach(function(key) {
+      var item = resource[key];
+
+      if (isObject(item)) {
+        response[key] = response[key] || [];
+
+        if (!Array.isArray(item)) {
+          item = [item];
+        }
+        response[key] = response[key].concat(item);
+      }
+    });
+};

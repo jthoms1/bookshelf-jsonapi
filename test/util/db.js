@@ -17,7 +17,10 @@ module.exports = {
   models: {
     authors: bk.Model.extend({
       tableName: 'authors',
-      idAttribute: 'id'
+      idAttribute: 'id',
+      books: function () {
+        return this.hasMany(module.exports.models.books, 'author_id');
+      }
     }),
     books: bk.Model.extend({
       tableName: 'books',

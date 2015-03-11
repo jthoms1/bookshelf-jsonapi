@@ -94,11 +94,11 @@ module.exports = function (models, options) {
 
       getListOfItems(params, req.Model)
         .then(function(gatheredItems) {
-          var respJSON = {};
-          respJSON.data = (gatheredItems || []).map(function(item) {
+          req.apiData = {};
+          req.apiData.data = (gatheredItems || []).map(function(item) {
             item.type = req.ResourceName;
+            return item;
           });
-          req.apiData = respJSON;
           next();
         })
         .catch(function(err) {
@@ -165,13 +165,15 @@ module.exports = function (models, options) {
 
       getListOfItems(params, req.Model)
         .then(function(resourceItems) {
-          var model = resourceItems.toJSON()[0];
-          var respJSON = {};
-          respJSON.data = model;
-          respJSON.data.type = req.ResourceName;
-          respJSON.data.links = {};
-          respJSON.data.links.self = req.path;
-          req.apiData = respJSON;
+          var modelJSON = resourceItems.toJSON()[0];
+
+          req.apiData = {};
+          req.apiData.data = assign(modelJSON, {
+            type: req.ResourceName,
+            links: {
+              self: req.path
+            }
+          });
           next();
         })
         .catch(function(err) {
@@ -227,12 +229,13 @@ module.exports = function (models, options) {
             return res.status(204).send();
           }
 
-          var respJSON = {};
-          respJSON.data = model.toJSON();
-          respJSON.data.type = req.ResourceName;
-          respJSON.data.links = {};
-          respJSON.data.links.self = req.path;
-          req.apiData = respJSON;
+          req.apiData = {};
+          req.apiData.data = assign(model.toJSON(), {
+            type: req.ResourceName,
+            links: {
+              self: req.path
+            }
+          });
           next();
         })
         .catch(function(err) {
