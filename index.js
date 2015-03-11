@@ -96,9 +96,11 @@ module.exports = function (models, options) {
         .then(function(gatheredItems) {
           req.apiData = {};
           req.apiData.data = (gatheredItems || []).map(function(item) {
+            item = item.toJSON();
             item.type = req.ResourceName;
             return item;
           });
+          req.apiData.linked = utils.deepToShallow(req.apiData.data);
           next();
         })
         .catch(function(err) {

@@ -78,7 +78,6 @@ describe('GET Collection', function () {
             throw err;
           }
           var body = JSON.parse(results.text);
-          console.log(body);
           expect(body.data).to.be.an('array');
           expect(body.data).to.have.length(5);
           done();
