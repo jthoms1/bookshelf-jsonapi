@@ -122,6 +122,16 @@ var deepToShallow = exports.deepToShallow = function(resource, response) {
   function isObject(key) {
     return resource[key] !== null && typeof resource[key] === 'object';
   }
+
+  response = response || {};
+
+  if (Array.isArray(resource)) {
+    resource.forEach(function(j) {
+      deepToShallow(j, response);
+    });
+
+    return response;
+  }
   return Object.keys(resource)
     .filter(isObject)
     .reduce(function(list, key) {
@@ -139,5 +149,5 @@ var deepToShallow = exports.deepToShallow = function(resource, response) {
       });
 
       return list;
-    }, response || {});
+    }, response);
 };

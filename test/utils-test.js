@@ -246,5 +246,106 @@ describe('Utility Module', function () {
       expect(resultsArray).to.eql(mockArray);
       done();
     });
+
+    it('should convert multiple sub items to array of items', function(done) {
+      var data = [
+        {
+          id: '10',
+          name: 'Gus',
+          books: [
+            {
+              id: '1',
+              name: 'that one book',
+              authorId: '10',
+              groups: [
+                {
+                  id: '30',
+                  name: 'that one group',
+                  members: {
+                    id: '1',
+                    name: 'John'
+                  }
+                }
+              ]
+            }, {
+              id: '2',
+              name: 'that other book',
+              authorId: '10'
+            }
+          ]
+        },
+        {
+          id: '11',
+          name: 'Gus',
+          books: [
+            {
+              id: '3',
+              name: 'that one book',
+              authorId: '11',
+              groups: [
+                {
+                  id: '31',
+                  name: 'that one group',
+                  members: {
+                    id: '2',
+                    name: 'John'
+                  }
+                }
+              ]
+            }, {
+              id: '4',
+              name: 'that other book',
+              authorId: '11'
+            }
+          ]
+        }
+      ];
+      var mockArray = {
+        groups: [
+          {
+            id: '30',
+            name: 'that one group'
+          }, {
+            id: '31',
+            name: 'that one group'
+          }
+        ],
+        members: [
+          {
+            id: '1',
+            name: 'John'
+          },
+          {
+            id: '2',
+            name: 'John'
+          }
+        ],
+        books: [
+          {
+            id: '1',
+            name: 'that one book',
+            authorId: '10'
+          },
+          {
+            id: '2',
+            name: 'that other book',
+            authorId: '10'
+          },
+          {
+            id: '3',
+            name: 'that one book',
+            authorId: '11'
+          },
+          {
+            id: '4',
+            name: 'that other book',
+            authorId: '11'
+          }
+        ]
+      };
+      var resultsArray = utils.deepToShallow(data);
+      expect(resultsArray).to.eql(mockArray);
+      done();
+    });
   });
 });
