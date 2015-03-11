@@ -117,25 +117,27 @@ exports.parseLimits = function(parameters) {
 /*
  * Convert object relationships to array of objects
  */
-exports.deepToShallow = function(resource, response) {
+var deepToShallow = exports.deepToShallow = function(resource, response) {
 
   function isObject(key) {
     return resource[key] !== null && typeof resource[key] === 'object';
   }
+  return Object.keys(resource)
+    .filter(isObject)
+    .reduce(function(list, key) {
+      var items = resource[key];
 
-  response = response || {};
-
-  Object.keys(resource)
-    .forEach(function(key) {
-      var item = resource[key];
-
-      if (isObject(item)) {
-        response[key] = response[key] || [];
-
-        if (!Array.isArray(item)) {
-          item = [item];
-        }
-        response[key] = response[key].concat(item);
+      if (!Array.isArray(items)) {
+        items = [items];
       }
-    });
+
+      items.forEach(function(i) {
+        deepToShallow(i, list);
+        delete resource[key];
+        list[key] = list[key] || [];
+        list[key].push(i);
+      });
+
+      return list;
+    }, response || {});
 };

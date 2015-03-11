@@ -243,7 +243,6 @@ describe('Utility Module', function () {
         ]
       };
       var resultsArray = utils.deepToShallow(data);
-      console.log(resultsArray);
       expect(resultsArray).to.eql(mockArray);
       done();
     });
