@@ -87,10 +87,7 @@ describe('PUT Resource', function () {
           'publish_year': 2001,
           'page_length': 440,
           'author_id': 1,
-          'type': 'books',
-          'links': {
-            'self': '/books/0553380958'
-          }
+          'type': 'books'
         }
       };
 

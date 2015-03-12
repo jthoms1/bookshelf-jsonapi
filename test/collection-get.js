@@ -63,6 +63,9 @@ describe('GET Collection', function () {
           var body = JSON.parse(results.text);
           expect(body.data).to.be.an('array');
           expect(body.data).to.have.length(5);
+          body.data.forEach(function(item) {
+            expect(item).to.only.have.keys(['id', 'type', 'name', 'twitter', 'follower_count', 'created_at', 'updated_at']);
+          });
           done();
         });
     });

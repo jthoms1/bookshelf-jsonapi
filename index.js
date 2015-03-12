@@ -7,6 +7,7 @@ var router = express.Router();
 var jsonParser = bodyParser.json();
 var utils = require('./utils');
 var assign = require('object-assign');
+var converter = require('jsonapi2simple');
 
 var RESERVED_PARAMS = ['sort', 'include', 'limit', 'itemId'];
 var ALLOWED_METHODS = {
@@ -131,19 +132,16 @@ module.exports = function (models, options) {
       }
 
       // Remove type when saving
-      delete req.body.data.type;
-      delete req.body.data.links;
+      var reqJSON = converter.toSimple(req.body);
 
       req.Model
-        .forge(req.body.data)
+        .forge(reqJSON)
         .save()
         .then(function(model) {
-          var respJSON = {};
-          respJSON.data = model.toJSON();
-          respJSON.data.type = req.ResourceName;
-          respJSON.data.links = {};
-          respJSON.data.links.self = req.path;
-          req.apiData = respJSON;
+          req.apiData = converter.toJsonApi(model.toJSON(), {
+            type: req.ResourceName,
+            baseUrl: req.path
+          });
           res.status(201);
           next();
         })
@@ -169,12 +167,9 @@ module.exports = function (models, options) {
         .then(function(resourceItems) {
           var modelJSON = resourceItems.toJSON()[0];
 
-          req.apiData = {};
-          req.apiData.data = assign(modelJSON, {
+          req.apiData = converter.toJsonApi(modelJSON, {
             type: req.ResourceName,
-            links: {
-              self: req.path
-            }
+            baseUrl: req.path
           });
           next();
         })
@@ -206,9 +201,7 @@ module.exports = function (models, options) {
         });
       }
 
-      // Remove type when saving
-      delete req.body.data.type;
-      delete req.body.data.links;
+      var reqJSON = converter.toSimple(req.body);
 
       var previousAttributes;
       var model = new req.Model();
@@ -219,8 +212,8 @@ module.exports = function (models, options) {
         .fetch(fetchParams)
         .then(function() {
           // Create hash of the expected updates to the model.
-          previousAttributes = JSON.stringify(assign(model.toJSON(), req.body.data));
-          return model.save(req.body.data, {patch: true});
+          previousAttributes = JSON.stringify(assign(model.toJSON(), reqJSON));
+          return model.save(reqJSON, {patch: true});
         })
         .then(function() {
           // Create hash of the actual updates to the model.
@@ -231,12 +224,9 @@ module.exports = function (models, options) {
             return res.status(204).send();
           }
 
-          req.apiData = {};
-          req.apiData.data = assign(model.toJSON(), {
+          req.apiData = converter.toJsonApi(model.toJSON(), {
             type: req.ResourceName,
-            links: {
-              self: req.path
-            }
+            baseUrl: req.path
           });
           next();
         })
