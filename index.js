@@ -22,7 +22,7 @@ var CONTENT_TYPE = 'application/vnd.api+json';
 function buildQuery(parameters) {
   return function (qb) {
 
-    if (parameters.hasOwnProperty('itemId') && typeof itemId !== 'undefined') {
+    if (parameters.hasOwnProperty('itemId') && typeof parameters.itemId !== 'undefined') {
       qb.whereIn('id', parameters.itemId);
     }
 
