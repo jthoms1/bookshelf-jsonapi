@@ -246,6 +246,33 @@ describe('Utility Module', function () {
       expect(resultsArray).to.eql(mockArray);
       done();
     });
+    it('should not convert non array/key value objects to items', function(done) {
+      var data = [
+        {
+          'id': 2,
+          'playlist_id': 2,
+          'song_id': 2,
+          'playlist_order': 1,
+          'created_at': null,
+          'updated_at': '2015-02-12T04:25:44.251Z',
+          'type': 'playlistSongs'
+        },
+        {
+          'id': 7,
+          'playlist_id': 2,
+          'song_id': 3,
+          'playlist_order': 1,
+          'created_at': '2015-02-12T04:26:14.248Z',
+          'updated_at': '2015-02-12T04:26:14.248Z',
+          'type': 'playlistSongs'
+        }
+      ];
+      var mockArray = {
+      };
+      var resultsArray = utils.deepToShallow(data);
+      expect(resultsArray).to.eql(mockArray);
+      done();
+    });
 
     it('should convert multiple sub items to array of items', function(done) {
       var data = [
