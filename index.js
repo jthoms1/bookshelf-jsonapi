@@ -121,6 +121,16 @@ module.exports = function (models, options) {
         });
       }
 
+      if (!req.body.data.hasOwnProperty('id') && req.body.data.id !== params.itemId) {
+        return res.status(409).json({
+          errors: [
+            {
+              title: 'Resource id attribute should be equal to "' + params.itemId + '".'
+            }
+          ]
+        });
+      }
+
       if (!req.body.data.hasOwnProperty('type') && req.body.data.type !== req.ResourceName) {
         return res.status(409).json({
           errors: [
@@ -140,7 +150,7 @@ module.exports = function (models, options) {
         .then(function(model) {
           req.apiData = converter.toJsonApi(model.toJSON(), {
             type: req.ResourceName,
-            baseUrl: req.path
+            baseUrl: req.baseUrl
           });
           res.status(201);
           next();
@@ -169,7 +179,7 @@ module.exports = function (models, options) {
 
           req.apiData = converter.toJsonApi(modelJSON, {
             type: req.ResourceName,
-            baseUrl: req.path
+            baseUrl: req.baseUrl
           });
           next();
         })
@@ -180,12 +190,21 @@ module.exports = function (models, options) {
     .put(jsonParser, function (req, res, next) {
       var params = paramTransform(req) || {};
       params.itemId = req.params.itemId;
-
       if (req.body === null || typeof req.body !== 'object' || !req.body.hasOwnProperty('data')) {
         return res.status(400).json({
           errors: [
             {
               title: 'Request object must contain a data attribute.'
+            }
+          ]
+        });
+      }
+
+      if (!req.body.data.hasOwnProperty('id') && req.body.data.id !== params.itemId) {
+        return res.status(409).json({
+          errors: [
+            {
+              title: 'Resource id attribute should be equal to "' + params.itemId + '".'
             }
           ]
         });
@@ -201,12 +220,16 @@ module.exports = function (models, options) {
         });
       }
 
-      var reqJSON = converter.toSimple(req.body);
-
       var previousAttributes;
       var model = new req.Model();
       var fetchParams = {};
       fetchParams[model.idAttribute] = params.itemId;
+
+      var reqJSON = converter.toSimple(req.body);
+      if (model.idAttribute !== 'id') {
+        reqJSON[model.idAttribute] = reqJSON.id;
+        delete reqJSON.id;
+      }
 
       model
         .fetch(fetchParams)
@@ -224,13 +247,20 @@ module.exports = function (models, options) {
             return res.status(204).send();
           }
 
-          req.apiData = converter.toJsonApi(model.toJSON(), {
+          var modelJSON = model.toJSON();
+          if (model.idAttribute !== 'id') {
+            modelJSON.id = modelJSON[model.idAttribute];
+            delete modelJSON[model.idAttribute];
+          }
+
+          req.apiData = converter.toJsonApi(modelJSON, {
             type: req.ResourceName,
-            baseUrl: req.path
+            baseUrl: req.baseUrl
           });
           next();
         })
         .catch(function(err) {
+          console.log(err);
           res.status(500).send(err);
         });
     })

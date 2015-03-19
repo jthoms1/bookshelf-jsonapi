@@ -65,7 +65,10 @@ describe('POST Resource', function () {
           'name': 'Richard Stallman',
           'twitter': null,
           'follower_count': 0,
-          'id': 6
+          'id': 6,
+          'links': {
+            'self': '/api/authors/6'
+          }
         }
       };
       request(app)

@@ -59,7 +59,10 @@ describe('GET Resource', function () {
           'follower_count': 35700,
           'created_at': null,
           'updated_at': null,
-          'type': 'authors'
+          'type': 'authors',
+          'links': {
+            'self': '/api/authors/1'
+          }
         }
       };
       request(app)

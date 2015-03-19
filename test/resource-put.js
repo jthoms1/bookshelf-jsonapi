@@ -55,7 +55,10 @@ describe('PUT Resource', function () {
         'data': {
           'id': 1,
           'type': 'authors',
-          'follower_count': 12
+          'follower_count': 12,
+          'links': {
+            'self': '/api/authors/1'
+          }
         }
       };
       request(app)
@@ -74,20 +77,23 @@ describe('PUT Resource', function () {
     it('should return a 200 and all resources if values updated other than those sent', function (done) {
       var reqBody = {
         'data': {
-          'isbn10': '0553380958',
+          'id': '0553380958',
           'publish_year': 2001,
           'type': 'books'
         }
       };
       var mock = {
         'data': {
-          'isbn10': '0553380958',
+          'id': '0553380958',
           'created_at': null,
           'name': 'Snow Crash',
           'publish_year': 2001,
           'page_length': 440,
           'author_id': 1,
-          'type': 'books'
+          'type': 'books',
+          'links': {
+            'self': '/api/books/0553380958'
+          }
         }
       };
 
