@@ -1,6 +1,6 @@
 {
-  "name": "jsonapi-bookshelf",
-  "version": "0.1.0",
+  "name": "bookshelf-jsonapi",
+  "version": "0.2.0",
   "description": "Bookshelf model based api middleware using JSON API",
   "main": "index.js",
   "scripts": {
