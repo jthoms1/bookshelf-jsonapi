@@ -86,5 +86,29 @@ describe('GET Collection', function () {
           done();
         });
     });
+
+    it('should include sorted resources', function(done) {
+      request(app)
+        .get('/api/authors?sort=-id')
+        .expect(200)
+        .expect(helper.headerContains('Content-Type', 'application/vnd.api+json'))
+        .end(function(err, results) {
+          if (err) {
+            console.log(err);
+            throw err;
+          }  
+
+          var body = JSON.parse(results.text);
+          expect(body.data).to.be.an('array');
+          expect(body.data).to.have.length(5);
+          
+          body.data.reduce(function(prev, cur){
+            expect(prev.id).to.be.above(cur.id);
+            return cur;
+          });
+
+          done();
+        });
+    });
   });
 });
