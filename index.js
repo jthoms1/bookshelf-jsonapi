@@ -95,13 +95,13 @@ module.exports = function (models, options) {
 
       getListOfItems(params, req.Model)
         .then(function(gatheredItems) {
-          req.apiData = {};
-          req.apiData.data = (gatheredItems || []).map(function(item) {
-            item = item.toJSON();
-            item.type = req.ResourceName;
-            return item;
+          var modelsJSON = (gatheredItems || []).map(function(item) {
+            return item.toJSON();
           });
-          req.apiData.linked = utils.deepToShallow(req.apiData.data);
+          req.apiData = converter.toJsonApi(modelsJSON, {
+            type: req.ResourceName,
+            baseUrl: req.baseUrl
+          });
           next();
         })
         .catch(function(err) {
