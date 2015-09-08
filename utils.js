@@ -118,7 +118,7 @@ function parseLimits(parameters) {
 function deepToShallow(resource, response) {
 
   function isObject(key) {
-    return resource[key] !== null && typeof resource[key] === 'object';
+    return !(resource[key] instanceof Date) && resource[key] !== null && typeof resource[key] === 'object';
   }
 
   response = response || {};
