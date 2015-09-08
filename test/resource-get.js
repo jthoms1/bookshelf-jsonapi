@@ -57,8 +57,8 @@ describe('GET Resource', function () {
           'name': 'Neal Stephenson',
           'twitter': '@nealstephenson',
           'follower_count': 35700,
-          'created_at': null,
-          'updated_at': null,
+          'created_at': 'Mon Sep 07 2015 20:22:28 GMT-0500 (CDT)',
+          'updated_at': 'Mon Sep 07 2015 20:22:28 GMT-0500 (CDT)',
           'type': 'authors',
           'links': {
             'self': '/api/authors/1'
