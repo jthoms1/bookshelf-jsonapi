@@ -85,7 +85,7 @@ describe('PUT Resource', function () {
       var mock = {
         'data': {
           'id': '0553380958',
-          'created_at': null,
+          'created_at': 'Mon Sep 07 2015 20:22:28 GMT-0500 (CDT)',
           'name': 'Snow Crash',
           'publish_year': 2001,
           'page_length': 440,

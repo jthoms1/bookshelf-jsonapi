@@ -274,6 +274,66 @@ describe('Utility Module', function () {
       done();
     });
 
+    it('should not convert dates to items', function(done) {
+      var date = new Date();
+      var data = {
+        id: '10',
+        name: 'Gus',
+        books: [
+          {
+            id: '1',
+            name: 'that one book',
+            authorId: '10',
+            'created_at': date,
+            groups: [
+              {
+                id: '30',
+                name: 'that one group',
+                members: {
+                  id: '1',
+                  name: 'John'
+                }
+              }
+            ]
+          }, {
+            id: '2',
+            name: 'that other book',
+            authorId: '10'
+          }
+        ]
+      };
+      var mockArray = {
+        groups: [
+          {
+            id: '30',
+            name: 'that one group'
+          }
+        ],
+        members: [
+          {
+            id: '1',
+            name: 'John'
+          }
+        ],
+        books: [
+          {
+            id: '1',
+            name: 'that one book',
+            'created_at': date,
+            authorId: '10'
+          },
+          {
+            id: '2',
+            name: 'that other book',
+            authorId: '10'
+          }
+        ]
+      };
+      var resultsArray = utils.deepToShallow(data);
+      expect(resultsArray).to.eql(mockArray);
+      done();
+    });
+
     it('should convert multiple sub items to array of items', function(done) {
       var data = [
         {

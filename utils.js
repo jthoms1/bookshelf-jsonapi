@@ -3,8 +3,8 @@
 
 var RESERVED_PARAMS = ['sort', 'include', 'limit', 'itemId'];
 
-exports.checkResourceType = function() {
-};
+function checkResourceType() {
+}
 
 /*
  * Relationship URLS
@@ -12,8 +12,8 @@ exports.checkResourceType = function() {
  * GET /api/user/1/links/organization
  * GET /api/user/1/links/posts
  */
-exports.convertRelationshipUrl = function() {
-};
+function convertRelationshipUrl() {
+}
 
 /*
  * Filtering Resources
@@ -28,19 +28,17 @@ exports.convertRelationshipUrl = function() {
  * GET /api/user?createdAt=lt:10
  * GET /api/user?firstName=like:Joh*
  */
-exports.parseFilters = function(parameters) {
-
-  function isNotReserved(value) {
-    return RESERVED_PARAMS.indexOf(value) === -1;
-  }
+function parseFilters(parameters) {
 
   return Object.keys(parameters)
-    .filter(isNotReserved)
+    .filter(function(key) {
+      return RESERVED_PARAMS.indexOf(key) === -1;
+    })
     .reduce(function(obj, key) {
       obj[key] = parameters[key];
       return obj;
     }, {});
-};
+}
 
 /*
  * Inclusion of Linked Resources
@@ -50,13 +48,13 @@ exports.parseFilters = function(parameters) {
  * GET /api/posts/1?include=author,comments,comments.author
  * GET /api/posts?include=author,comments,comments.author
  */
-exports.parseLinks = function(parameters) {
+function parseLinks(parameters) {
   if (parameters.hasOwnProperty('include')) {
     return {
       withRelated: parameters.include.split(',')
     };
   }
-};
+}
 //.fetchAll({columns: ['symbol', 'name']})
 
 /*
@@ -68,7 +66,7 @@ exports.parseLinks = function(parameters) {
  * Bookshelf:
  *   .orderBy(column, [direction])
  */
-exports.parseSorting = function(parameters) {
+function parseSorting(parameters) {
   var direction,
     column;
 
@@ -90,7 +88,7 @@ exports.parseSorting = function(parameters) {
       column: parameters.sort.substr(1)
     };
   }
-};
+}
 
 /*
  * Limit Resource Length with Cursor
@@ -102,7 +100,7 @@ exports.parseSorting = function(parameters) {
  *   .limit(value)
  *   .offset(value)
  */
-exports.parseLimits = function(parameters) {
+function parseLimits(parameters) {
   var resourcelimit = 10;
 
   if (parameters.limit) {
@@ -112,15 +110,15 @@ exports.parseLimits = function(parameters) {
   return {
     limit: resourcelimit
   };
-};
+}
 
 /*
  * Convert object relationships to array of objects
  */
-var deepToShallow = exports.deepToShallow = function(resource, response) {
+function deepToShallow(resource, response) {
 
   function isObject(key) {
-    return resource[key] !== null && typeof resource[key] === 'object';
+    return !(resource[key] instanceof Date) && resource[key] !== null && typeof resource[key] === 'object';
   }
 
   response = response || {};
@@ -150,4 +148,12 @@ var deepToShallow = exports.deepToShallow = function(resource, response) {
 
       return list;
     }, response);
+}
+
+module.exports = {
+  'parseFilters': parseFilters,
+  'parseLinks': parseLinks,
+  'parseSorting': parseSorting,
+  'parseLimits': parseLimits,
+  'deepToShallow': deepToShallow
 };

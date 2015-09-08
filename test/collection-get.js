@@ -81,6 +81,7 @@ describe('GET Collection', function () {
             throw err;
           }
           var body = JSON.parse(results.text);
+          console.log(JSON.stringify(body, null, 2));
           expect(body.data).to.be.an('array');
           expect(body.data).to.have.length(5);
           done();
@@ -96,13 +97,13 @@ describe('GET Collection', function () {
           if (err) {
             console.log(err);
             throw err;
-          }  
+          }
 
           var body = JSON.parse(results.text);
           expect(body.data).to.be.an('array');
           expect(body.data).to.have.length(5);
-          
-          body.data.reduce(function(prev, cur){
+
+          body.data.reduce(function(prev, cur) {
             expect(prev.id).to.be.above(cur.id);
             return cur;
           });
